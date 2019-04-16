@@ -22,6 +22,22 @@ private:
 	int moveFrequency = 15;	// The lower this value is, the fast the enemies will move down
 public:
 	EnemyGroup() {
+		if (!m_alienTexture_1.loadFromFile("src\\PACMAN RED ENEMY.png")) {
+			cout << "Unable to load alien texture!" << endl;
+			exit(EXIT_FAILURE);
+		}
+		if (!m_alienTexture_2.loadFromFile("src\\PACMAN CYAN ENEMY.png")) {
+			cout << "Unable to load alien texture!" << endl;
+			exit(EXIT_FAILURE);
+		}
+		if (!m_alienTexture_3.loadFromFile("src\\PACMAN ORANGE ENEMY.png")) {
+			cout << "Unable to load alien texture!" << endl;
+			exit(EXIT_FAILURE);
+		}
+		if (!m_alienTexture_4.loadFromFile("src\\PACMAN PINK ENEMY.png")) {
+			cout << "Unable to load alien texture!" << endl;
+			exit(EXIT_FAILURE);
+		}
 		loadEnemies(NEW);
 		levelComplete = false;
 	}
@@ -79,23 +95,7 @@ public:
 	}
 
 	void setTextures() {
-		if (!m_alienTexture_1.loadFromFile("src\\PACMAN RED ENEMY.png")) {
-			cout << "Unable to load alien texture!" << endl;
-			exit(EXIT_FAILURE);
-		}
-		if (!m_alienTexture_2.loadFromFile("src\\PACMAN CYAN ENEMY.png")) {
-			cout << "Unable to load alien texture!" << endl;
-			exit(EXIT_FAILURE);
-		}
-		if (!m_alienTexture_3.loadFromFile("src\\PACMAN ORANGE ENEMY.png")) {
-			cout << "Unable to load alien texture!" << endl;
-			exit(EXIT_FAILURE);
-		}
-		if (!m_alienTexture_4.loadFromFile("src\\PACMAN PINK ENEMY.png")) {
-			cout << "Unable to load alien texture!" << endl;
-			exit(EXIT_FAILURE);
-		}
-		// Generates a random number
+		// Generates a random number and assigns the corresponding texture
 		int random;
 		random = ((rand() % 4) + 1);
 		switch (random) {
@@ -113,7 +113,6 @@ public:
 
 	// Loads the list of enemies to display
 	// Called for constructor and when a life is lost
-	
 	void loadEnemies(reloadEnum value) {
 		if (value == NEW) {
 			setTextures();
