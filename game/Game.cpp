@@ -1,43 +1,27 @@
-#include <iostream>
-#include <SFML/Graphics.hpp>
-#include "MissileGroup.h"
-#include "UI.h"
-#include "BombGroup.h"
-using namespace std;
-using namespace sf;
+#include "Game.h"
 
-//============================================================
-// Luke Rodman
-// Space Invaders Final Project
-// April 2019
-//============================================================
-
-int main()
+int Game::Start()
 {
 	srand((unsigned)time(0));
-	const int WINDOW_WIDTH = 800;
-	const int WINDOW_HEIGHT = 600;
 
-	Vector2f mousePos;
+	sf::Vector2f mousePos;
 
 	// Shapes and text for the pause menu
-	Font font;
-	if (!font.loadFromFile("C:\\Windows\\Fonts\\arial.ttf")) {
-		cout << "couldn't load font\n";
-	}
-	Text startText("Start", font, 32);
-	startText.setPosition(Vector2f(380.0f, 280.0f));
-	CircleShape startButton;
-	startButton.setFillColor(Color::Red);
-	startButton.setOutlineColor(Color::Black);
+	sf::Font font = Assets::loadGameFontAsset(Assets::arialFontPath);
+
+	sf::Text startText("Start", font, 32);
+	sf::CircleShape startButton;
+	startText.setPosition(sf::Vector2f(380.0f, 280.0f));
+	startButton.setFillColor(sf::Color::Red);
+	startButton.setOutlineColor(sf::Color::Black);
 	startButton.setRadius(45);
-	startButton.setPosition(Vector2f(368.0f, 255.0f));
+	startButton.setPosition(sf::Vector2f(368.0f, 255.0f));
 
 	// Counter for if a bomb or should not be dropped
 	int bombCounter = 0;
 	int bombFreq = 70;
 
-	RenderWindow window(VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), " Space Invaders -- Remake -- ");
+	sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), " Space Invaders -- Remake -- ");
 	// Limit the framerate to 60 frames per second
 	window.setFramerateLimit(60);
 
@@ -54,27 +38,29 @@ int main()
 	{
 		// check all the window's events that were triggered since the last iteration of the loop
 		// For now, we just need this so we can click on the window and close it
-		mousePos = window.mapPixelToCoords(Mouse::getPosition(window));
+		mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 
-		Event event;
+		sf::Event event;
 
 		while (window.pollEvent(event))
 		{
 			// "close requested" event: we close the window
-			if (event.type == Event::Closed)
+			if (event.type == sf::Event::Closed)
 				window.close();
-			else if (event.type == Event::KeyPressed)
+			else if (event.type == sf::Event::KeyPressed)
 			{
-				if (event.key.code == Keyboard::Space && missiles.getNumberOfMissiles() < 6)
+				if (event.key.code == sf::Keyboard::Space && missiles.getNumberOfMissiles() < 6)
 				{
 					missiles.FireMissile(theShip);
 				}
-				else if (event.key.code == Keyboard::Escape) {
+				else if (event.key.code == sf::Keyboard::Escape)
+				{
 					//cout << "key pressed" << endl;
 					ui.setPause(true);
 				}
 			}
-			else if (event.type == Event::MouseButtonReleased && startButton.getGlobalBounds().contains(mousePos)) {
+			else if (event.type == sf::Event::MouseButtonReleased && startButton.getGlobalBounds().contains(mousePos))
+			{
 				ui.setPause(false);
 			}
 		}
@@ -85,19 +71,23 @@ int main()
 
 
 
-		if (ui.getPause()) {
+		if (ui.getPause())
+		{
 			//cout << "Paused" << endl;
 			ui.drawBackground(window);
 			window.draw(startButton);
 			window.draw(startText);
 		}
-		else {
+		else
+		{
 			//cout << "Not Paused" << endl;
 			// If the ship is alive, this logic will run
 			// If not, the game is over
-			if (theShip.getShipStatus()) {
+			if (theShip.getShipStatus())
+			{
 
-				if (!(enemies.isLevelComplete())) {
+				if (!(enemies.isLevelComplete()))
+				{
 
 					// Draws the background for the game
 					ui.drawBackground(window);
@@ -119,7 +109,8 @@ int main()
 					// Moves the enemies that are still in the list
 					enemies.updateEnemies(window);
 
-					if (enemies.wasEnemyHit()) {
+					if (enemies.wasEnemyHit())
+					{
 						bombs.enemyDown();	// If enemy was hit, then reduce the number of enemies that bombs can assign a bomb to
 						ui.enemyHit();	// Increase the score
 					}
@@ -130,7 +121,8 @@ int main()
 					// Level is only reset when the ship detects that the aliens have reached it's y-value
 					// OR when it is struck by a bomb
 					// Ship checks for alien y values and BombGroup checks for bomb intersections
-					if (enemies.wasLevelReset()) {
+					if (enemies.wasLevelReset())
+					{
 						missiles.ResetGroup();			// If level was resest ( ship was hit by bomb or alien got to the end )
 						bombs.ResetGroup(enemies);		// reset the bombs, missiles, and score
 						ui.setScore(ui.getPreviousLevelScore());
@@ -141,16 +133,19 @@ int main()
 			}
 
 			// Checks value of counter and if it should then drop a bomb
-			if (bombFreq <= 0) {
+			if (bombFreq <= 0)
+			{
 				bombFreq = 1;
 			}
-			if (bombCounter % bombFreq == 0) {
+			if (bombCounter % bombFreq == 0)
+			{
 				bombs.dropBomb(enemies);
 			}
 
 			// Checks to see if there are any aliens left in the list ( triggered by isLevelComplete )
 			// Then resets the lives of the ship, reloads the aliens, and deletes the missiles and bombs
-			if (enemies.isLevelComplete()) {
+			if (enemies.isLevelComplete())
+			{
 				//cout << "Moving to next level" << endl;
 				ui.setPreviousLevelScore(ui.getScore());
 				missiles.ResetGroup();
@@ -161,7 +156,8 @@ int main()
 			}
 
 			// If the ship is out of lives, it will draw end game screen
-			if (!(theShip.getShipStatus())) {
+			if (!(theShip.getShipStatus()))
+			{
 				ui.drawBackground(window);
 				ui.drawEndGame(window);
 			}
@@ -174,4 +170,3 @@ int main()
 	}
 	return 0;
 }
-
